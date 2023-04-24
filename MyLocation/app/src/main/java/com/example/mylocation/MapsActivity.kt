@@ -1,8 +1,11 @@
 package com.example.mylocation
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -82,6 +85,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var fusedLocationClient : FusedLocationProviderClient
     lateinit var locationCallback: LocationCallback
 
+    @SuppressLint("MissingPermission")
     fun updateLocationListner(){
         //LocationRequest.create()는 deprecate 됨
         val locationRequest = LocationRequest.create()
@@ -101,10 +105,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             }
-        }$
+        }
 
 
         //로케이션 요청 함수 호출 (locationRequest, locationCallback)
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
+    }
+
+    fun setLastLocation(location : Location){
+        val myLocation = LatLng(location.latitude, location.longitude)
+        val markerOption = MarkerOptions()
+            .position(myLocation)
+            .title("I am here!")
     }
 
 
