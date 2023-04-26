@@ -22,6 +22,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.CameraPosition
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -74,10 +76,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        // Add a marker
+        setUpdateLocationListner()
     }
 
     //내 위치를 가져오는 코드
@@ -86,7 +87,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     lateinit var locationCallback: LocationCallback
 
     @SuppressLint("MissingPermission")
-    fun updateLocationListner(){
+    fun setUpdateLocationListner(){
         //LocationRequest.create()는 deprecate 됨
         val locationRequest = LocationRequest.create()
 
@@ -114,9 +115,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun setLastLocation(location : Location){
         val myLocation = LatLng(location.latitude, location.longitude)
-        val markerOption = MarkerOptions()
+        val marker = MarkerOptions()
             .position(myLocation)
             .title("I am here!")
+        val cameraOption = CameraPosition.builder()
+            .target(myLocation)
+            .zoom(15.0f)
+            .build()
+
+        val camera = CameraUpdateFactory.newCameraPosition(cameraOption)
+
+        mMap.clear()
+        mMap.addMarker(marker)
+        mMap.moveCamera(camera)
     }
 
 
